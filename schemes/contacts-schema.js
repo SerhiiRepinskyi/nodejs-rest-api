@@ -1,7 +1,7 @@
 const Joi = require("joi");
 
 // Joi-schema - опис вимог до об'єкту body
-const addSchema = Joi.object({
+const contactsAddSchema = Joi.object({
   name: Joi.string().required().messages({
     "any.required": "missing required name field",
     "string.empty": "name cannot be empty",
@@ -16,4 +16,4 @@ const addSchema = Joi.object({
   }), // Додати регулярний вираз
 });
 
-module.exports = { addSchema };
+module.exports = { contactsAddSchema };

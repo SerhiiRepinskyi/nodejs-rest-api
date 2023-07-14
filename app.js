@@ -2,10 +2,11 @@ const express = require("express");
 const logger = require("morgan");
 const cors = require("cors");
 
-const contactsRouter = require("./routes/api/contacts");
+const contactsRouter = require("./routes/api/contacts-router");
 
 const app = express();
 
+// Виводить в консоль детальну інформацію про запити
 const formatsLogger = app.get("env") === "development" ? "dev" : "short";
 
 app.use(logger(formatsLogger));
@@ -19,7 +20,7 @@ app.use((req, res) => {
   res.status(404).json({ message: "Not found" });
 });
 
-// Обробник помилок
+// Обробник помилок Express з 4-ма параметрами
 app.use((err, req, res, next) => {
   const { status = 500, message = "Server error" } = err;
   res.status(status).json({ message });
