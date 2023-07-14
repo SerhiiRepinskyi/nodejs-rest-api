@@ -1,4 +1,4 @@
-const Joi = require("joi");
+import Joi from "joi";
 
 // Joi-schema - опис вимог до об'єкту body
 const contactsAddSchema = Joi.object({
@@ -16,4 +16,4 @@ const contactsAddSchema = Joi.object({
   }), // Додати регулярний вираз
 });
 
-module.exports = { contactsAddSchema };
+export default { contactsAddSchema };

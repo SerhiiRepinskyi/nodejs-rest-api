@@ -1,8 +1,8 @@
-const contactsService = require("../models/contacts");
+import contactsService from "../models/contacts.js";
 
-const { ctrlWrapper } = require("../decorators");
+import { ctrlWrapper } from "../decorators/index.js";
 
-const { HttpError } = require("../helpers");
+import { HttpError } from "../helpers/index.js";
 
 const getAll = async (req, res) => {
   const result = await contactsService.listContacts();
@@ -43,7 +43,7 @@ const updateById = async (req, res) => {
   res.json(result);
 };
 
-module.exports = {
+export default {
   getAll: ctrlWrapper(getAll),
   getById: ctrlWrapper(getById),
   add: ctrlWrapper(add),

@@ -1,5 +1,4 @@
-// import { HttpError } from "../helpers/index.js";
-const { HttpError } = require("../helpers");
+import { HttpError } from "../helpers/index.js";
 
 const isEmptyBody = (req, res, next) => {
   const { length } = Object.keys(req.body);
@@ -9,6 +8,4 @@ const isEmptyBody = (req, res, next) => {
   next();
 };
 
-module.exports = isEmptyBody;
-
-// export default isEmptyBody;
+export default isEmptyBody;

@@ -1,3 +1,1 @@
-const isEmptyBody = require("./isEmptyBody");
-
-module.exports = { isEmptyBody };
+export { default as isEmptyBody } from "./isEmptyBody.js";

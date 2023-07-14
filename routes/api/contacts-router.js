@@ -1,12 +1,12 @@
-const express = require("express");
+import express from "express";
 
-const contactsController = require("../../controllers/contacts-controller");
+import contactsController from "../../controllers/contacts-controller.js";
 
-const contactsSchema = require("../../schemes/contacts-schema");
+import contactsSchema from "../../schemes/contacts-schema.js";
 
-const { validateBody } = require("../../decorators");
+import { validateBody } from "../../decorators/index.js";
 
-const { isEmptyBody } = require("../../middlewares");
+import { isEmptyBody } from "../../middlewares/index.js";
 
 const contactsRouter = express.Router();
 
@@ -30,4 +30,4 @@ contactsRouter.put(
   contactsController.updateById
 );
 
-module.exports = contactsRouter;
+export default contactsRouter;
