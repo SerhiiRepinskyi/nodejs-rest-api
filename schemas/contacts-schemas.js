@@ -1,6 +1,7 @@
 import Joi from "joi";
 
-// Joi-schema - опис вимог до об'єкту body з фронтенда
+// Joi-schema - опис вимог до тіла запиту (об'єкт req.body)
+
 const contactsAddSchema = Joi.object({
   name: Joi.string().required().messages({
     "any.required": "missing required name field",
@@ -17,4 +18,8 @@ const contactsAddSchema = Joi.object({
   favorite: Joi.boolean(),
 });
 
-export default { contactsAddSchema };
+const contactUpdateFavoriteSchema = Joi.object({
+  favorite: Joi.boolean().required(),
+});
+
+export default { contactsAddSchema, contactUpdateFavoriteSchema };
