@@ -25,6 +25,7 @@ const contactSchema = new Schema(
 );
 
 // pre-hook - ПЕРЕД (pre) операцією (findOneAndUpdate) викликати функцію (validateAtUpdate)
+// За замовчуванням, при Update Mongoose не проводить валідацію
 contactSchema.pre("findOneAndUpdate", validateAtUpdate);
 
 // post-hooks
