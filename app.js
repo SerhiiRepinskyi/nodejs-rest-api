@@ -14,7 +14,7 @@ app.use(logger(formatsLogger));
 app.use(cors());
 app.use(express.json()); // Парсить тіло запиту (req.body) формату json в об'єкт
 
-app.use("/api/users", authRouter);
+app.use("/users", authRouter);
 app.use("/api/contacts", contactsRouter);
 
 // Обробка запиту на адресу, що не існує

@@ -1,10 +1,10 @@
 import express from "express";
 
-import ctrl from "../../controllers/auth-controller.js";
+import authController from "../../controllers/auth-controller.js";
 
 import { validateBody } from "../../decorators/index.js";
 
-import { schemas } from "../../models/user.js";
+import { usersSchemas } from "../../models/user.js";
 
 import { isEmptyBody } from "../../middlewares/index.js";
 
@@ -14,16 +14,16 @@ const authRouter = express.Router();
 authRouter.post(
   "/register",
   isEmptyBody,
-  validateBody(schemas.registerSchema),
-  ctrl.register
+  validateBody(usersSchemas.userRegisterSchema),
+  authController.register
 );
 
 // signin
 authRouter.post(
   "/login",
   isEmptyBody,
-  validateBody(schemas.registerSchema),
-  ctrl.login
+  validateBody(usersSchemas.userLoginSchema),
+  authController.login
 );
 
 export default authRouter;

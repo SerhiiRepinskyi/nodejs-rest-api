@@ -1,4 +1,4 @@
-import Contact from "../models/contact.js";
+import { Contact } from "../models/contact.js";
 
 import { ctrlWrapper } from "../decorators/index.js";
 
@@ -48,7 +48,7 @@ const updateById = async (req, res) => {
 const updateStatusContact = async (req, res) => {
   const { contactId } = req.params;
   const result = await Contact.findByIdAndUpdate(contactId, req.body, {
-    new: true,
+    new: true, // поверне нову версію дукументу
   });
   if (!result) {
     throw HttpError(404, "Not found");

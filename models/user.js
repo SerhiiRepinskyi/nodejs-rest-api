@@ -1,8 +1,9 @@
 import { Schema, model } from "mongoose";
 import Joi from "joi";
 
-import { handleMongooseError } from "./hooks.js";
+import { handleMongooseError, validateAtUpdate } from "./hooks.js";
 
+// constants
 const emailRegexp = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 const subscriptionList = ["starter", "pro", "business"];
 
@@ -17,7 +18,7 @@ const userSchema = new Schema(
     email: {
       type: String,
       match: emailRegexp,
-      required: [true, "Email is required"], 
+      required: [true, "Email is required"],
       unique: true,
     },
     subscription: {
@@ -31,10 +32,13 @@ const userSchema = new Schema(
   { versionKey: false, timestamps: true }
 );
 
+userSchema.pre("findOneAndUpdate", validateAtUpdate);
+
 userSchema.post("save", handleMongooseError);
+userSchema.post("findOneAndUpdate", handleMongooseError);
 
 // Joi-schema - register
-const registerSchema = Joi.object({
+const userRegisterSchema = Joi.object({
   password: Joi.string().min(6).required().messages({
     "any.required": "missing required password field",
     "string.empty": "password cannot be empty",
@@ -47,7 +51,7 @@ const registerSchema = Joi.object({
 });
 
 // Joi-schema - login
-const loginSchema = Joi.object({
+const userLoginSchema = Joi.object({
   password: Joi.string().min(6).required().messages({
     "any.required": "missing required password field",
     "string.empty": "password cannot be empty",
@@ -58,12 +62,12 @@ const loginSchema = Joi.object({
   }),
 });
 
-const schemas = {
-  registerSchema,
-  loginSchema,
+const usersSchemas = {
+  userRegisterSchema,
+  userLoginSchema,
 };
 
 // Mongoose-model
 const User = model("user", userSchema);
 
-export { schemas, User };
+export { usersSchemas, User };

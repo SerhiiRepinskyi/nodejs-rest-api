@@ -2,9 +2,9 @@ import express from "express";
 
 import contactsController from "../../controllers/contacts-controller.js";
 
-import contactsSchemas from "../../schemas/contacts-schemas.js";
-
 import { validateBody } from "../../decorators/index.js";
+
+import { contactsSchemas } from "../../models/contact.js";
 
 import {
   isEmptyBody,
