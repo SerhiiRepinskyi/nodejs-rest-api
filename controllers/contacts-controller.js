@@ -8,18 +8,43 @@ const getAll = async (req, res) => {
   const { _id: owner } = req.user;
   const { page = 1, limit = 20 } = req.query; // req.query - об'єкт зі всіма параметрами пошуку (запиту)
   const skip = (page - 1) * limit;
+
+  const pageInt = Number.parseInt(page); // Конвертація значень з стрічки у числа
+  const limitInt = Number.parseInt(limit);
+  const totalContacts = await Contact.countDocuments({ owner }); // countDocuments - загальна кількість документів в колекції за певним фільтром
+
+  // Якщо задані параметри запиту по favorite: (GET /contacts?favorite=true),
+  // то повертаються відфільтровані за полем favorite контакти
+  if (req.query.favorite) {
+    const favorite = req.query.favorite; // true
+    const totalContactsFavorite = await Contact.countDocuments({
+      owner,
+      favorite,
+    });
+    const contactsFavorite = await Contact.find(
+      { owner, favorite },
+      "-createdAt -updatedAt",
+      {
+        skip,
+        limit,
+      }
+    ).populate("owner", "email subscription");
+    return res.json({
+      page: pageInt,
+      limit: limitInt,
+      totalContacts,
+      totalContactsFavorite,
+      contactsFavorite,
+    });
+  }
+
   const result = await Contact.find({ owner }, "-createdAt -updatedAt", {
     skip,
     limit,
   }).populate("owner", "email subscription");
   // знак "-" означає, що ці поля не брати з БД;
-  // для пагінаці (вбудовані інструменти): skip - скільки пропустити, limit - скільки повернути (в об'єкті налаштувань)
+  // для пагінаці (вбудовані інструменти): skip - скільки пропустити, limit - скільки повернути (в об'єкті налаштувань);
   // populate (розширення запиту) - замість id у полі owner поверне детальну інформацію (об'єкт), а саме email та subscription
-
-  // Конвертуємо значення з стрічки у числа
-  const pageInt = Number.parseInt(page);
-  const limitInt = Number.parseInt(limit);
-  const totalContacts = await Contact.countDocuments({ owner }); // countDocuments - загальна кількість документів в колекції за певним фільтром
 
   res.json({
     page: pageInt,
