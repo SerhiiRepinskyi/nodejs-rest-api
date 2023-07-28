@@ -9,7 +9,7 @@ const isEmptyBody = (req, res, next) => {
   next();
 };
 
-// isEmptyBodyFavorite - для перевірки спеціального випадку PATCH-запитів
+// isEmptyBodyFavorite - для перевірки спеціального випадку PATCH-запитів (".../:contactId/favorite")
 const isEmptyBodyFavorite = (req, res, next) => {
   if (req.method === "PATCH") {
     if (!req.body.hasOwnProperty("favorite") || req.body.favorite === "") {
@@ -19,4 +19,17 @@ const isEmptyBodyFavorite = (req, res, next) => {
   next();
 };
 
-export { isEmptyBody as default, isEmptyBodyFavorite };
+// isEmptyBodySubscription - для перевірки спеціального випадку PATCH-запитів (".../users")
+const isEmptyBodySubscription = (req, res, next) => {
+  if (req.method === "PATCH") {
+    if (
+      !req.body.hasOwnProperty("subscription") ||
+      req.body.subscription === ""
+    ) {
+      next(HttpError(400, "missing field subscription"));
+    }
+  }
+  next();
+};
+
+export { isEmptyBody as default, isEmptyBodyFavorite, isEmptyBodySubscription };

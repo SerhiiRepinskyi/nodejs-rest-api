@@ -1,4 +1,8 @@
-export { default as isEmptyBody, isEmptyBodyFavorite } from "./isEmptyBody.js";
+export {
+  default as isEmptyBody,
+  isEmptyBodyFavorite,
+  isEmptyBodySubscription,
+} from "./isEmptyBody.js";
 
 export { default as isValidId } from "./isValidId.js";
 

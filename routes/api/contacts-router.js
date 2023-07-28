@@ -7,10 +7,10 @@ import { validateBody } from "../../decorators/index.js";
 import { contactsSchemas } from "../../models/contact.js";
 
 import {
+  authenticate,
+  isValidId,
   isEmptyBody,
   isEmptyBodyFavorite,
-  isValidId,
-  authenticate,
 } from "../../middlewares/index.js";
 
 const contactsRouter = express.Router();

@@ -62,9 +62,17 @@ const userLoginSchema = Joi.object({
   }),
 });
 
+// Joi-schema - subscription
+const userUpdateSubscriptionSchema = Joi.object({
+  subscription: Joi.string()
+    .valid(...subscriptionList)
+    .required(),
+});
+
 const usersSchemas = {
   userRegisterSchema,
   userLoginSchema,
+  userUpdateSubscriptionSchema,
 };
 
 // Mongoose-model
