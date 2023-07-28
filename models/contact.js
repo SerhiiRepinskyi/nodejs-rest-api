@@ -20,6 +20,12 @@ const contactSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    // властивість owner - щоб кожен користувач бачив тільки свої контакти
+    owner: {
+      type: Schema.Types.ObjectId, // id
+      ref: "user", // назва колекції
+      required: true,
+    },
   },
   // Поле з версією - не створювати, поле з датою створення та оновлення - створювати
   { versionKey: false, timestamps: true }

@@ -26,7 +26,7 @@ const userSchema = new Schema(
       enum: subscriptionList,
       default: "starter",
     },
-    token: String,
+    token: { type: String, default: "" },
   },
   // Поле з версією - не створювати, поле з датою створення та оновлення - створювати
   { versionKey: false, timestamps: true }

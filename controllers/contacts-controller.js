@@ -5,8 +5,28 @@ import { ctrlWrapper } from "../decorators/index.js";
 import { HttpError } from "../helpers/index.js";
 
 const getAll = async (req, res) => {
-  const result = await Contact.find();
-  res.json(result);
+  const { _id: owner } = req.user;
+  const { page = 1, limit = 20 } = req.query; // req.query - об'єкт зі всіма параметрами пошуку (запиту)
+  const skip = (page - 1) * limit;
+  const result = await Contact.find({ owner }, "-createdAt -updatedAt", {
+    skip,
+    limit,
+  }).populate("owner", "email subscription");
+  // знак "-" означає, що ці поля не брати з БД;
+  // для пагінаці (вбудовані інструменти): skip - скільки пропустити, limit - скільки повернути (в об'єкті налаштувань)
+  // populate (поширення запиту) - замість id у полі owner поверне детальну інформацію, а саме email та subscription
+
+  // Конвертуємо значення з стрічки у числа
+  const pageInt = Number.parseInt(page);
+  const limitInt = Number.parseInt(limit);
+  const totalContacts = await Contact.countDocuments({ owner }); // countDocuments - загальна кількість документів в колекції за певним фільтром
+
+  res.json({
+    page: pageInt,
+    limit: limitInt,
+    totalContacts,
+    contacts: result,
+  });
 };
 
 const getById = async (req, res) => {
@@ -19,7 +39,8 @@ const getById = async (req, res) => {
 };
 
 const add = async (req, res) => {
-  const result = await Contact.create(req.body);
+  const { _id: owner } = req.user;
+  const result = await Contact.create({ ...req.body, owner });
   res.status(201).json(result);
 };
 

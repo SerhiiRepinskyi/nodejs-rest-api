@@ -10,25 +10,38 @@ import {
   isEmptyBody,
   isEmptyBodyFavorite,
   isValidId,
+  authenticate,
 } from "../../middlewares/index.js";
 
 const contactsRouter = express.Router();
 
-contactsRouter.get("/", contactsController.getAll);
+contactsRouter.get("/", authenticate, contactsController.getAll);
 
-contactsRouter.get("/:contactId", isValidId, contactsController.getById);
+contactsRouter.get(
+  "/:contactId",
+  authenticate,
+  isValidId,
+  contactsController.getById
+);
 
 contactsRouter.post(
   "/",
+  authenticate,
   isEmptyBody,
   validateBody(contactsSchemas.contactsAddSchema),
   contactsController.add
 );
 
-contactsRouter.delete("/:contactId", isValidId, contactsController.deleteById);
+contactsRouter.delete(
+  "/:contactId",
+  authenticate,
+  isValidId,
+  contactsController.deleteById
+);
 
 contactsRouter.put(
   "/:contactId",
+  authenticate,
   isValidId,
   isEmptyBody,
   validateBody(contactsSchemas.contactsAddSchema),
@@ -37,6 +50,7 @@ contactsRouter.put(
 
 contactsRouter.patch(
   "/:contactId/favorite",
+  authenticate,
   isValidId,
   isEmptyBodyFavorite,
   validateBody(contactsSchemas.contactUpdateFavoriteSchema),

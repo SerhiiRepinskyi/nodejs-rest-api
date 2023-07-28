@@ -6,7 +6,7 @@ import { validateBody } from "../../decorators/index.js";
 
 import { usersSchemas } from "../../models/user.js";
 
-import { isEmptyBody } from "../../middlewares/index.js";
+import { isEmptyBody, authenticate } from "../../middlewares/index.js";
 
 const authRouter = express.Router();
 
@@ -25,5 +25,9 @@ authRouter.post(
   validateBody(usersSchemas.userLoginSchema),
   authController.login
 );
+
+authRouter.get("/current", authenticate, authController.getCurrent);
+
+authRouter.post("/logout", authenticate, authController.logout);
 
 export default authRouter;

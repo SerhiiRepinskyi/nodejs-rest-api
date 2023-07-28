@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt"; // хешування/верифікація пароля
+import bcrypt from "bcryptjs"; // хешування/верифікація пароля
 import jwt from "jsonwebtoken"; // шифрування/розшифровування токена
 import "dotenv/config"; // відповідає за змінні оточення
 
@@ -45,6 +45,7 @@ const login = async (req, res) => {
   };
 
   const token = jwt.sign(payload, JWT_SECRET, { expiresIn: "23h" });
+  await User.findByIdAndUpdate(user._id, { token });
 
   res.json({
     token,
@@ -55,7 +56,24 @@ const login = async (req, res) => {
   });
 };
 
+const getCurrent = async (req, res) => {
+  const { email, subscription } = req.user;
+  res.json({
+    email,
+    subscription,
+  });
+};
+
+const logout = async (req, res) => {
+  const { _id } = req.user;
+  await User.findByIdAndUpdate(_id, { token: "" });
+
+  res.status(204).json();
+};
+
 export default {
   register: ctrlWrapper(register),
   login: ctrlWrapper(login),
+  getCurrent: ctrlWrapper(getCurrent),
+  logout: ctrlWrapper(logout),
 };
