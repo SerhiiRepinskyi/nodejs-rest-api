@@ -14,7 +14,7 @@ const getAll = async (req, res) => {
   }).populate("owner", "email subscription");
   // знак "-" означає, що ці поля не брати з БД;
   // для пагінаці (вбудовані інструменти): skip - скільки пропустити, limit - скільки повернути (в об'єкті налаштувань)
-  // populate (поширення запиту) - замість id у полі owner поверне детальну інформацію, а саме email та subscription
+  // populate (розширення запиту) - замість id у полі owner поверне детальну інформацію (об'єкт), а саме email та subscription
 
   // Конвертуємо значення з стрічки у числа
   const pageInt = Number.parseInt(page);
@@ -39,7 +39,7 @@ const getById = async (req, res) => {
 };
 
 const add = async (req, res) => {
-  const { _id: owner } = req.user;
+  const { _id: owner } = req.user; // деструктуризація з перейменуванням
   const result = await Contact.create({ ...req.body, owner });
   res.status(201).json(result);
 };

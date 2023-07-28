@@ -2,9 +2,9 @@ import jwt from "jsonwebtoken";
 
 import { User } from "../models/user.js";
 
-import { HttpError } from "../helpers/index.js";
+import { ctrlWrapper } from "../decorators/index.js";
 
-import "dotenv/config";
+import { HttpError } from "../helpers/index.js";
 
 const { JWT_SECRET } = process.env;
 
@@ -12,20 +12,20 @@ const authenticate = async (req, res, next) => {
   const { authorization = "" } = req.headers;
   const [bearer, token] = authorization.split(" ");
   if (bearer !== "Bearer") {
-    next(HttpError(401, "Not authorized"));
+    throw HttpError(401, "Not authorized");
   }
   try {
     const { id } = jwt.verify(token, JWT_SECRET);
     const user = await User.findById(id);
-    // якщо немає користувача або в нього немає токена або токен, який в нього є не дорівнює тому, що прислали
+    // якщо немає користувача за id в БД або в нього немає токена або токен користувача з БД не дорівнює токену, що прислали
     if (!user || !user.token || user.token !== token) {
-      next(HttpError(401, "Not authorized"));
+      throw HttpError(401, "Not authorized");
     }
     req.user = user; // додавання в req.user інформації про конкретного user (для запису у властивість owner)
     next();
   } catch {
-    next(HttpError(401, "Not authorized"));
+    throw HttpError(401, "Not authorized");
   }
 };
 
-export default authenticate;
+export default ctrlWrapper(authenticate);
