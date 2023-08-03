@@ -13,6 +13,7 @@ const formatsLogger = app.get("env") === "development" ? "dev" : "short";
 app.use(logger(formatsLogger));
 app.use(cors());
 app.use(express.json()); // Парсить тіло запиту (req.body) формату json в об'єкт
+app.use(express.static("public")); // Роздача статичних файлів - при запиті на статичний файл, шукати його в папці "public"
 
 app.use("/users", authRouter);
 app.use("/api/contacts", contactsRouter);
