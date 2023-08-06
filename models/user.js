@@ -27,6 +27,7 @@ const userSchema = new Schema(
       default: "starter",
     },
     token: { type: String, default: "" },
+    avatarURL: { type: String, required: true },
   },
   // Поле з версією - не створювати, поле з датою створення та оновлення - створювати
   { versionKey: false, timestamps: true }

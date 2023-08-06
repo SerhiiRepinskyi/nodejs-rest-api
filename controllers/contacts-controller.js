@@ -9,7 +9,7 @@ const getAll = async (req, res) => {
   const { page = 1, limit = 20 } = req.query; // req.query - об'єкт зі всіма параметрами пошуку (запиту)
   const skip = (page - 1) * limit;
 
-  const pageInt = Number.parseInt(page); // Конвертація значень з стрічки у числа
+  const pageInt = Number.parseInt(page); // Конвертація значення із стрічки у число
   const limitInt = Number.parseInt(limit);
   const totalContacts = await Contact.countDocuments({ owner }); // countDocuments - загальна кількість документів в колекції за певним фільтром
 

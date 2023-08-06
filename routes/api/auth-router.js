@@ -10,6 +10,7 @@ import {
   authenticate,
   isEmptyBody,
   isEmptyBodySubscription,
+  upload,
 } from "../../middlewares/index.js";
 
 const authRouter = express.Router();
@@ -43,6 +44,14 @@ authRouter.patch(
   isEmptyBodySubscription,
   validateBody(usersSchemas.userUpdateSubscriptionSchema),
   authController.updateStatusSubscription
+);
+
+// update avatar
+authRouter.patch(
+  "/avatars",
+  authenticate,
+  upload.single("avatar"), // Використання middleware upload, де "avatar" - поле в form-data (Body), в якому очікуємо один прикріплений файл (single)
+  authController.updateAvatar
 );
 
 export default authRouter;
