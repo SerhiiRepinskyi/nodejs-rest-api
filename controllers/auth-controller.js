@@ -9,9 +9,14 @@ import { User } from "../models/user.js";
 
 import { ctrlWrapper } from "../decorators/index.js";
 
-import { HttpError, processingImage, sendEmail } from "../helpers/index.js";
+import {
+  HttpError,
+  processingImage,
+  sendEmail,
+  createVerifyEmail,
+} from "../helpers/index.js";
 
-const { JWT_SECRET, BASE_URL } = process.env;
+const { JWT_SECRET } = process.env;
 
 const avatarsPath = path.resolve("public", "avatars"); // абсолютний шлях до папки з файлами avatars
 const imagesExtensionsArray = ["jpg", "jpeg", "png", "bmp", "tiff", "gif"]; // підтримувані Jimp розширення зображень
@@ -34,14 +39,9 @@ const register = async (req, res) => {
     verificationToken,
   });
 
-  // Створення verifyEmail для підтвердження
-  const verifyEmail = {
-    to: email,
-    subject: "Verify email",
-    html: `<a target="_blank" href="${BASE_URL}/users/verify/${verificationToken}">Click verify email</a>`,
-  };
-
-  await sendEmail(verifyEmail); // Відсилаємо verifyEmail
+  // Створення та відправлення verifyEmail для верифікації після реєстрації
+  const verifyEmail = createVerifyEmail({ email, verificationToken });
+  await sendEmail(verifyEmail);
 
   res.status(201).json({
     user: {
@@ -59,7 +59,7 @@ const verifyEmail = async (req, res) => {
   }
   await User.findByIdAndUpdate(user._id, {
     verify: true,
-    verificationToken: " ",
+    verificationToken: "",
   });
 
   res.json({
@@ -71,19 +71,17 @@ const resendVerifyEmail = async (req, res) => {
   const { email } = req.body;
   const user = await User.findOne({ email });
   if (!user) {
-    throw HttpError(401, "Email not found");
+    throw HttpError(404, "Email not found");
   }
   if (user.verify) {
     throw HttpError(400, "Verification has already been passed");
   }
 
-  // Створення verifyEmail для підтвердження (verificationToken береться з user з БД)
-  const verifyEmail = {
-    to: email,
-    subject: "Verify email",
-    html: `<a target="_blank" href="${BASE_URL}/users/verify/${user.verificationToken}">Click verify email</a>`,
-  };
-
+  // Створення verifyEmail (verificationToken береться з user з БД)
+  const verifyEmail = createVerifyEmail({
+    email,
+    verificationToken: user.verificationToken,
+  });
   await sendEmail(verifyEmail); // Відсилаємо verifyEmail повторно
 
   res.json({

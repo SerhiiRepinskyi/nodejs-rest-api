@@ -34,7 +34,7 @@ const userSchema = new Schema(
     },
     verificationToken: {
       type: String,
-      required: [true, "Verify token is required"],
+      // required: [true, "Verify token is required"],
     },
   },
   // Поле з версією - не створювати, поле з датою створення та оновлення - створювати
