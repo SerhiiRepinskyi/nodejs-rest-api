@@ -3,14 +3,15 @@ import jwt from "jsonwebtoken"; // шифрування/розшифровува
 import gravatar from "gravatar"; // створення тимчасової аватарки
 import path from "path"; // створення шляхів та їх нормалізація (для різних операційних систем)
 import fs from "fs/promises"; // робота з файлами
+import { nanoid } from "nanoid";
 
 import { User } from "../models/user.js";
 
 import { ctrlWrapper } from "../decorators/index.js";
 
-import { HttpError, processingImage } from "../helpers/index.js";
+import { HttpError, processingImage, sendEmail } from "../helpers/index.js";
 
-const { JWT_SECRET } = process.env;
+const { JWT_SECRET, BASE_URL } = process.env;
 
 const avatarsPath = path.resolve("public", "avatars"); // абсолютний шлях до папки з файлами avatars
 const imagesExtensionsArray = ["jpg", "jpeg", "png", "bmp", "tiff", "gif"]; // підтримувані Jimp розширення зображень
@@ -24,12 +25,23 @@ const register = async (req, res) => {
 
   const hashPassword = await bcrypt.hash(password, 10); // хешування паролю, 10 - складність (сіль)
   const avatarURL = gravatar.url(email); // створення посилання на тимчасову аватарку
+  const verificationToken = nanoid();
 
   const newUser = await User.create({
     ...req.body,
     password: hashPassword,
     avatarURL,
+    verificationToken,
   });
+
+  // Створення verifyEmail для підтвердження
+  const verifyEmail = {
+    to: email,
+    subject: "Verify email",
+    html: `<a target="_blank" href="${BASE_URL}/users/verify/${verificationToken}">Click verify email</a>`,
+  };
+
+  await sendEmail(verifyEmail); // Відсилаємо verifyEmail
 
   res.status(201).json({
     user: {
@@ -39,12 +51,57 @@ const register = async (req, res) => {
   });
 };
 
+const verifyEmail = async (req, res) => {
+  const { verificationToken } = req.params;
+  const user = await User.findOne({ verificationToken });
+  if (!user) {
+    throw HttpError(404, "User not found");
+  }
+  await User.findByIdAndUpdate(user._id, {
+    verify: true,
+    verificationToken: " ",
+  });
+
+  res.json({
+    message: "Verification successful",
+  });
+};
+
+const resendVerifyEmail = async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw HttpError(401, "Email not found");
+  }
+  if (user.verify) {
+    throw HttpError(400, "Verification has already been passed");
+  }
+
+  // Створення verifyEmail для підтвердження (verificationToken береться з user з БД)
+  const verifyEmail = {
+    to: email,
+    subject: "Verify email",
+    html: `<a target="_blank" href="${BASE_URL}/users/verify/${user.verificationToken}">Click verify email</a>`,
+  };
+
+  await sendEmail(verifyEmail); // Відсилаємо verifyEmail повторно
+
+  res.json({
+    message: "Verification email sent",
+  });
+};
+
 const login = async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
   if (!user) {
     throw HttpError(401, "Email or password is wrong");
   }
+
+  if (!user.verify) {
+    throw HttpError(401, "Email not verified");
+  }
+
   const passwordCompare = await bcrypt.compare(password, user.password); // порівняння пароля, що прийшов (req.body) із захешованим паролем (з БД)
   if (!passwordCompare) {
     throw HttpError(401, "Email or password is wrong");
@@ -136,6 +193,8 @@ const updateAvatar = async (req, res) => {
 
 export default {
   register: ctrlWrapper(register),
+  verifyEmail: ctrlWrapper(verifyEmail),
+  resendVerifyEmail: ctrlWrapper(resendVerifyEmail),
   login: ctrlWrapper(login),
   getCurrent: ctrlWrapper(getCurrent),
   logout: ctrlWrapper(logout),
