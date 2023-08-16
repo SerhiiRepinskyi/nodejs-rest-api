@@ -28,6 +28,14 @@ const userSchema = new Schema(
     },
     token: { type: String, default: "" },
     avatarURL: { type: String, required: true },
+    verify: {
+      type: Boolean,
+      default: false,
+    },
+    verificationToken: {
+      type: String,
+      // required: [true, "Verify token is required"],
+    },
   },
   // Поле з версією - не створювати, поле з датою створення та оновлення - створювати
   { versionKey: false, timestamps: true }
@@ -51,6 +59,14 @@ const userRegisterSchema = Joi.object({
   subscription: Joi.string().valid(...subscriptionList),
 });
 
+// Joi-schema - verify
+const userEmailSchema = Joi.object({
+  email: Joi.string().pattern(emailRegexp).required().messages({
+    "any.required": "missing required email field",
+    "string.empty": "email cannot be empty",
+  }),
+});
+
 // Joi-schema - login
 const userLoginSchema = Joi.object({
   password: Joi.string().min(6).required().messages({
@@ -72,6 +88,7 @@ const userUpdateSubscriptionSchema = Joi.object({
 
 const usersSchemas = {
   userRegisterSchema,
+  userEmailSchema,
   userLoginSchema,
   userUpdateSubscriptionSchema,
 };
